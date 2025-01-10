@@ -230,6 +230,35 @@ body {
 }
 
 
+    /*Estilo para telas com altura menor que 500px */
+
+@media(max-height:500px){
+    .toggle-menu {
+        display: block;
+    }
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+
+    .search-bar {
+    display: flex
+;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    width: 400px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+   
+}
+
+
 /* Estilo para telas com largura menor que 768px */
 @media (max-width: 768px) {
     .toggle-menu {
