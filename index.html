@@ -230,7 +230,7 @@ body {
 }
 
 
-    /*Estilo para telas com largura menor que 500px */
+/* Estilo para telas com largura menor que 500px */
 
 @media(max-width:500px){
     .toggle-menu {
@@ -256,7 +256,11 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
    
 }
-
+    .leaflet-control-zoom leaflet-bar leaflet-control{
+        margin-top:-105px;
+        
+    }
+}
 
 /* Estilo para telas com largura menor que 768px */
 @media (max-width: 768px) {
@@ -275,7 +279,7 @@ body {
     position: absolute;
     display:flex;
     align-items:center;
-    margin-top: -165px; /* Ajuste a posição vertical acima do botão de zoom */
+    margin-top: -180px; /* Ajuste a posição vertical acima do botão de zoom */
     right: 10px; /* Margem direita */
     z-index: 2;
     background-color: white;
