@@ -254,8 +254,16 @@ body {
     padding: 5px 10px;
     max-width: min-content;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-   
-}
+   }
+
+   .route-bar{
+    max-width:293px;
+ }
+
+    .rtt{
+        width:288px;
+    }
+
     .leaflet-control-zoom leaflet-bar leaflet-control{
         margin-top:-105px;
         
@@ -365,7 +373,7 @@ body {
 
     <div class="route-bar" id="route-bar" style="margin-left:20px; position:absolute; z-index:2; margin-top:62px; box-shadow:black;">
         <input type="text" id="destination" placeholder="Digite seu Destino">
-        <button id="find-route">Buscar Rota</button>
+        <button id="find-route" class="rtt">Buscar Rota</button>
     </div>
 
     <script>
