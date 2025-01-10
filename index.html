@@ -156,7 +156,8 @@ body {
 
 /* Definindo o tamanho do mapa */
 #map {
-    width: 100%;
+    margin-left:420px;
+    width: 62.6%;
     height: 88vh;
     
 }
@@ -359,7 +360,7 @@ body {
 <body>
 
 
-    <div class="search-bar" style="margin-top:20px; margin-left:20px; position:absolute; z-index:2;">
+    <div class="search-bar" style="margin-top:20px; margin-left:10px; position:absolute; z-index:200000;">
         
         <input type="text" id="origin" placeholder="Pesquise no Mapas">
         <button id="search-icon">
@@ -368,13 +369,10 @@ body {
         <button id="route-icon">
             <i class="fa-solid fa-route" style="color: #0050db;" alt="Traçar Rotas"></i>
         </button>
-        <div id="autocomplete-suggestions" style="position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none; z-index: 3; width: 400px;"></div>
+        <div id="autocomplete-suggestions" style="position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none; z-index:200001; width: 400px;"></div>
     </div>
 
-    <div class="route-bar" id="route-bar" style="margin-left:20px; position:absolute; z-index:2; margin-top:62px; box-shadow:black;">
-        <input type="text" id="destination" placeholder="Digite seu Destino">
-        <button id="find-route" class="rtt">Buscar Rota</button>
-    </div>
+    
 
     <script>
     
@@ -389,7 +387,7 @@ body {
         }
 
         // Faz a chamada à API do Nominatim para buscar sugestões
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`)
+        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=BR&format=json&addressdetails=1&limit=5`)
             .then(response => response.json())
             .then(data => {
                 if (data.length === 0) {
@@ -442,7 +440,10 @@ body {
 
 
     </script>
-
+    <div class="route-bar" id="route-bar" style="margin-left:10px; position:absolute; z-index:200003; margin-top:62px; box-shadow:black;">
+        <input type="text" id="destination" placeholder="Digite seu Destino">
+        <button id="find-route" class="rtt">Buscar Rota</button></div>
+    
     <script>
         const routeIcon = document.getElementById('route-icon');
         const routeBar = document.getElementById('route-bar');
@@ -453,18 +454,20 @@ body {
 
         let currentRouteLayer = null; // Variável global para armazenar a camada atual da rota
 
-document.getElementById('find-route').addEventListener('click', () => {
-    const origin = document.getElementById('origin').value;
-    const destination = document.getElementById('destination').value;
+    document.getElementById('find-route').addEventListener('click', () => {
+        const origin = document.getElementById('origin').value;
+        const destination = document.getElementById('destination').value;
 
     if (!origin || !destination) {
         alert('Por favor, preencha o ponto de origem e destino.');
         return;
     }
+    
+    
 
     // Usa a API de geocodificação do Nominatim para converter endereços em coordenadas
     const geocodeURL = (address) =>
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+        `https://nominatim.openstreetmap.org/search?q=Rio de Janeiro&countrycodes=BR&format=json&q=${encodeURIComponent(address)}`;
 
     Promise.all([
         fetch(geocodeURL(origin)).then(res => res.json()),
@@ -482,54 +485,75 @@ document.getElementById('find-route').addEventListener('click', () => {
             return fetch(routeURL)
                 .then(res => res.json())
                 .then(routeData => {
-                    if (routeData.routes.length === 0) {
+                    if (!routeData.routes || routeData.routes.length === 0) {
                         alert('Nenhuma rota encontrada.');
                         return;
                     }
-        
+                
                     // Remove a rota anterior (se existir)
                     if (currentRouteLayer) {
                         map.removeLayer(currentRouteLayer);
                     }
-        
+                
                     // Adiciona a nova rota ao mapa
                     const route = routeData.routes[0].geometry;
+                    const duration = routeData.routes[0].duration; // Duração em segundos
+                    const distance = routeData.routes[0].distance; // Distância em metros
                     currentRouteLayer = L.geoJSON(route, {
                         style: {
                             color: 'blue',
                             weight: 4
                         }
                     }).addTo(map);
-        
+                
                     // Centraliza o mapa na nova rota
                     map.fitBounds(currentRouteLayer.getBounds());
-                });
-        })
-        .catch(error => console.error('Erro ao traçar a rota:', error));
-        
-    });
+                
+                    // Converte o tempo em formato legível (horas e minutos)
+                    const durationHours = Math.floor(duration / 3600);
+                    const durationMinutes = Math.ceil((duration % 3600) / 60);
+                
+                    // Atualiza o conteúdo da div 'route-info' com as informações da rota
+                    const routeInfoBox = document.getElementById('route-info');
+                    routeInfoBox.innerHTML = `
+                        <p class="1d" style="margin-top:10px;"><strong>Tempo estimado:</strong> ${durationHours > 0 ? `${durationHours}h` : ''} ${durationMinutes}min</p>
+                        <p class="2d" style="margin-top: -15px;"><strong>Distância:</strong> ${(distance / 1000).toFixed(2)} km</p>
+                    `;
+                })
+                .catch(error => console.error('Erro ao traçar a rota:', error));}
+            
+            
+)});
+            </script>                
 
+
+    <div id="route-info" style="width: 423px;height: 100%;/* padding: 46px; */margin-left: 11px;margin-top: 155px;/* border: 1px solid #ccc; *//* background-color: #f9f9f9; */z-index: 5;position: absolute;"></div>
+
+    <script>document.getElementById('route-info').innerHTML = `
+        <p><strong>Tempo estimado:</strong> ${durationHours > 0 ? `${durationHours}h` : ''} ${durationMinutes}min</p>
+        <p><strong>Distância:</strong> ${(distance / 1000).toFixed(2)} km</p>
+    `;
     </script>
-
 
     <div id="map" style="z-index:0"></div>
 
-    
-        <div class="locate-button" onclick="locateUser()">
-        <span class="material-symbols-outlined" style=".material-symbols-outlined:font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,
-        'opsz' 24;">my_location</span>
-        </div>
+    <div class="locate-button" onclick="locateUser()">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;">
+        my_location
+      </span>
+    </div>
     
     <script>
       // Inicializa o mapa
       const map = L.map('map').setView([-23.000372, -43.365894], 10);
     
-      // Adiciona o layer base
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors & CartoDB',
-        subdomains: 'abcd',
-        maxZoom: 19
-    }).addTo(map);
+      // Adiciona o layer base com fundo preto e texto branco
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors & CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 19,
+            opacity: 1.0 // Garante fundo completamente preto
+        }).addTo(map);
     
       // Adiciona um círculo azul para a localização do usuário
       var userMarker = L.circleMarker([0.0, -0.09], {
@@ -566,19 +590,20 @@ document.getElementById('find-route').addEventListener('click', () => {
       } else {
         alert("Geolocalização não é suportada por este navegador.");
       }
-
-    // Função para redirecionar o mapa para a localização do usuário
-  function locateUser() {
-    // Obtém a última posição conhecida do marcador
-    var latLng = userMarker.getLatLng();
     
-    // Centraliza o mapa na última localização do usuário
-    map.setView(latLng, 16); // Redefine o zoom e a localização
-  }
-        
+      // Função para redirecionar o mapa para a localização do usuário
+      function locateUser() {
+        // Obtém a última posição conhecida do marcador
+        var latLng = userMarker.getLatLng();
+    
+        // Centraliza o mapa na última localização do usuário
+        map.setView(latLng, 16); // Redefine o zoom e a localização
+      }
+    
+      // Posiciona o controle de zoom no canto inferior direito
+      map.zoomControl.setPosition('bottomright');
 
-    map.zoomControl.setPosition('bottomright');
-    // Caminhos dos arquivos KMZ
+    
     
     
     const kmzUrls = [
@@ -636,7 +661,7 @@ document.getElementById('find-route').addEventListener('click', () => {
                         style: feature => ({
                             color: feature.properties.stroke || 'blue',
                             fillColor: feature.properties.fill || 'blue',
-                            fillOpacity: feature.properties['fill-opacity'] || 0.5,
+                            fillOpacity: feature.properties['fill-opacity'] || 0.250,
                             weight: feature.properties['stroke-width'] || 2
                         }),
                         pointToLayer: function (feature, latlng) {
